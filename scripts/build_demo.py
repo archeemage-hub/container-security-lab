@@ -10,6 +10,7 @@ environment = json.loads((evidence / "environment.json").read_text())
 assert results["total"] == len(results["checks"])
 assert results["passed"] == sum(check["passed"] for check in results["checks"])
 data = {
+    "version": (ROOT / "VERSION").read_text().strip(),
     "results": results,
     "snapshots": json.loads((evidence / "runtime-snapshots.json").read_text()),
     "environment": {

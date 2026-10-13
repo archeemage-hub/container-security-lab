@@ -1,4 +1,5 @@
 const labEvidence = {
+  "version": "1.0.1",
   "results": {
     "passed": 41,
     "total": 41,

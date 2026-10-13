@@ -210,6 +210,7 @@ window.addEventListener("storage", event => {
 });
 
 const passed = labEvidence.results.checks.filter(check => check.passed).length;
+find("project-version").textContent = `Container Security Lab ${labEvidence.version} · учебный проект`;
 const measured = new Date(labEvidence.environment.timestamp_utc).toLocaleString("ru-RU", { timeZone: "Europe/Moscow" });
 find("evidence-summary").textContent = `Пройдено ${passed} из ${labEvidence.results.total} проверок. Измерение: ${measured} по Москве.`;
 find("environment-description").textContent = `Linux ${labEvidence.environment.kernel}; Docker ${labEvidence.environment.docker}; K3s ${labEvidence.environment.kubernetes}.`;

@@ -1,11 +1,11 @@
 # Безопасность Docker и Kubernetes
 
-Учебный проект Container Security Lab 1.0.0 к статье «Безопасность контейнеров
+Учебный проект Container Security Lab 1.0.1 к статье «Безопасность контейнеров
 Docker и Kubernetes». На примере сервиса заметок сравниваются обычные
 и усиленные настройки контейнеров. Приложение написано на Python
 без сторонних библиотек.
 
-[Полный гайд по запуску, проверкам и публикации на GitHub](docs/GUIDE.md)
+[Документация по запуску и проверке](docs/GUIDE.md)
 
 [Открыть демонстрацию в браузере](https://archeemage-hub.github.io/container-security-lab/)
 
@@ -18,8 +18,8 @@ Docker и Kubernetes». На примере сервиса заметок сра
 ## Репозиторий и статья
 
 Репозиторий: [archeemage-hub/container-security-lab](https://github.com/archeemage-hub/container-security-lab).
-Версия для статьи: [v1.0.0](https://github.com/archeemage-hub/container-security-lab/tree/v1.0.0).
-Гайд объясняет запуск, публикацию и оформление библиографического источника № 1. Связь выводов статьи
+Версия для статьи: [v1.0.1](https://github.com/archeemage-hub/container-security-lab/tree/v1.0.1).
+Документация описывает развёртывание и проверку стенда. Связь выводов статьи
 с результатами приведена в [ARTICLE_MAP.md](evidence/ARTICLE_MAP.md).
 
 В проекте два сервиса: `gateway` принимает запросы, а `store` хранит заметки
@@ -42,7 +42,7 @@ Docker и Kubernetes». На примере сервиса заметок сра
 | `scripts/update_manifest.py` | Обновление контрольных сумм после изменений |
 | `scripts/build_demo.py` | Обновление данных HTML-демонстрации из протокола |
 | `evidence/` | Результаты, использованные в статье |
-| `docs/GUIDE.md` | Подробная инструкция по работе и публикации |
+| `docs/GUIDE.md` | Требования, запуск, проверки и диагностика |
 | `docs/index.html` | Демонстрация для браузера и GitHub Pages |
 
 ## Запуск
