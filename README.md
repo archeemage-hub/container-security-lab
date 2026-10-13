@@ -1,6 +1,6 @@
 # Безопасность Docker и Kubernetes
 
-Учебный проект Container Security Lab 1.0.1 к статье «Безопасность контейнеров
+Учебный проект Container Security Lab 1.0.2 к статье «Безопасность контейнеров
 Docker и Kubernetes». На примере сервиса заметок сравниваются обычные
 и усиленные настройки контейнеров. Приложение написано на Python
 без сторонних библиотек.
@@ -18,7 +18,7 @@ Docker и Kubernetes». На примере сервиса заметок сра
 ## Репозиторий и статья
 
 Репозиторий: [archeemage-hub/container-security-lab](https://github.com/archeemage-hub/container-security-lab).
-Версия для статьи: [v1.0.1](https://github.com/archeemage-hub/container-security-lab/tree/v1.0.1).
+Версия для статьи: [v1.0.2](https://github.com/archeemage-hub/container-security-lab/tree/v1.0.2).
 Документация описывает развёртывание и проверку стенда. Связь выводов статьи
 с результатами приведена в [ARTICLE_MAP.md](evidence/ARTICLE_MAP.md).
 
@@ -66,7 +66,7 @@ python3 scripts/build_demo.py
 Настройки находятся в обычных YAML-файлах и не генерируются скриптом.
 
 Обычный вариант доступен по адресу `http://127.0.0.1:18081/notes`,
-усиленный — `http://127.0.0.1:18080/notes`.
+усиленный - `http://127.0.0.1:18080/notes`.
 GET `/notes` возвращает заметки, POST `/notes` с JSON
 `{"text":"Учебная заметка"}` создаёт новую. Ограничения: 160 символов
 на заметку, 100 заметок в хранилище и 4096 байт на запрос.
@@ -99,8 +99,8 @@ docker exec csl-k3s /bin/kubectl get networkpolicy -n article-secure
 ## Результаты и ограничения
 
 Последний запуск: **41/41 проверок пройдено**. Полные результаты находятся
-в `evidence/checks.json`, параметры процессов — в `runtime-snapshots.json`,
-сведения о среде — в `environment.json`. Файл `ARTICLE_MAP.md` связывает
+в `evidence/checks.json`, параметры процессов - в `runtime-snapshots.json`,
+сведения о среде - в `environment.json`. Файл `ARTICLE_MAP.md` связывает
 эти материалы с выводами статьи. Контрольные суммы перечислены в
 `MANIFEST.sha256`.
 

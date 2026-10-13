@@ -24,10 +24,10 @@ const names = {
 };
 
 const environments = {
-  "Docker baseline": "Docker · обычный",
-  "Docker hardened": "Docker · усиленный",
-  "Kubernetes baseline": "Kubernetes · обычный",
-  "Kubernetes hardened": "Kubernetes · усиленный",
+  "Docker baseline": "Docker (обычный)",
+  "Docker hardened": "Docker (усиленный)",
+  "Kubernetes baseline": "Kubernetes (обычный)",
+  "Kubernetes hardened": "Kubernetes (усиленный)",
   Image: "Образ приложения",
   Logging: "Журналы"
 };
@@ -64,7 +64,7 @@ function loadNotes() {
   }
   notes = value;
   find("storage-status").textContent = persistent
-    ? "Заметки сохраняются в этом браузере отдельно для каждой конфигурации."
+    ? ""
     : "Хранилище браузера недоступно. Заметки останутся только до закрытия страницы.";
 }
 
@@ -84,8 +84,8 @@ function renderNotes() {
   find("note-caption").textContent = `Заметки: ${notes.length} / 100`;
   if (notes.length === 0) {
     const row = document.createElement("tr");
-    cell(row, "—");
-    cell(row, "Заметок пока нет. Создайте первую.");
+    cell(row, "-");
+    cell(row, "Нет заметок.");
     list.append(row);
   }
   for (const note of notes) {
@@ -97,8 +97,6 @@ function renderNotes() {
 }
 
 function renderConfiguration() {
-  const label = `${platform === "docker" ? "Docker" : "Kubernetes"} · ${profile === "hardened" ? "усиленный" : "обычный"} вариант`;
-  find("configuration-description").textContent = `${label}. Код приложения одинаковый; меняются настройки запуска.`;
   const state = labEvidence.snapshots[platform][profile];
   const parameters = [
     ["UID / GID", `${state.uid} / ${state.gid}`],
@@ -106,7 +104,7 @@ function renderConfiguration() {
     ["Запись в /data и /tmp", state.data_write.allowed && state.temporary_write.allowed ? "Разрешена" : "Ограничена"],
     ["CapEff", state.cap_eff],
     ["NoNewPrivs", state.no_new_privs],
-    ["Seccomp", `${state.seccomp}${state.seccomp === "2" ? " · фильтрация включена" : " · фильтрация не включена"}`],
+    ["Seccomp", state.seccomp],
     ["Токен ServiceAccount", state.service_account_token ? "Подключён" : "Отсутствует"],
     ["Docker socket", state.docker_socket ? "Подключён" : "Отсутствует"]
   ];
@@ -121,10 +119,10 @@ function renderConfiguration() {
   for (const button of document.querySelectorAll("[data-operation]")) {
     button.disabled = platform === "docker" && ["outsider", "admission"].includes(button.dataset.operation);
   }
-  find("experiment-status").textContent = "Результат выбранного действия появится здесь.";
+  find("experiment-status").textContent = "";
   loadNotes();
   renderNotes();
-  find("note-status").textContent = `HTTP 200 · прочитан список для конфигурации «${label}».`;
+  find("note-status").textContent = "";
 }
 
 function renderEvidence() {
@@ -157,7 +155,7 @@ find("note-form").addEventListener("submit", event => {
   loadNotes();
   const result = LabModel.createNote(notes, find("note-text").value);
   if (result.status !== 201) {
-    find("note-status").textContent = `HTTP ${result.status} · ${result.error}`;
+    find("note-status").textContent = `HTTP ${result.status}: ${result.error}`;
     return;
   }
   notes = result.notes;
@@ -165,7 +163,7 @@ find("note-form").addEventListener("submit", event => {
   renderNotes();
   find("note-text").value = "";
   find("note-counter").textContent = "0 / 160 символов";
-  find("note-status").textContent = `HTTP 201 · заметка № ${result.note.id} создана.`;
+  find("note-status").textContent = `HTTP 201: заметка № ${result.note.id} создана.`;
 });
 
 find("note-text").addEventListener("input", event => {
@@ -177,14 +175,14 @@ find("note-text").addEventListener("input", event => {
 find("read-notes").addEventListener("click", () => {
   loadNotes();
   renderNotes();
-  find("note-status").textContent = `HTTP 200 · прочитан список из ${notes.length} заметок.`;
+  find("note-status").textContent = `HTTP 200: прочитано ${notes.length} заметок.`;
 });
 
 find("clear-notes").addEventListener("click", () => {
   notes = [];
   saveNotes();
   renderNotes();
-  find("note-status").textContent = "Список выбранной конфигурации очищен в этом браузере.";
+  find("note-status").textContent = "Список очищен.";
 });
 
 for (const input of document.querySelectorAll('input[name="platform"], input[name="profile"]')) {
@@ -197,7 +195,7 @@ for (const input of document.querySelectorAll('input[name="platform"], input[nam
 
 for (const button of document.querySelectorAll("[data-operation]")) {
   button.addEventListener("click", () => {
-    find("experiment-status").textContent = "Модель: " + LabModel.experiment(platform, profile, button.dataset.operation, labEvidence.snapshots);
+    find("experiment-status").textContent = LabModel.experiment(platform, profile, button.dataset.operation, labEvidence.snapshots);
   });
 }
 
@@ -210,7 +208,7 @@ window.addEventListener("storage", event => {
 });
 
 const passed = labEvidence.results.checks.filter(check => check.passed).length;
-find("project-version").textContent = `Container Security Lab ${labEvidence.version} · учебный проект`;
+find("project-version").textContent = `Container Security Lab ${labEvidence.version}`;
 const measured = new Date(labEvidence.environment.timestamp_utc).toLocaleString("ru-RU", { timeZone: "Europe/Moscow" });
 find("evidence-summary").textContent = `Пройдено ${passed} из ${labEvidence.results.total} проверок. Измерение: ${measured} по Москве.`;
 find("environment-description").textContent = `Linux ${labEvidence.environment.kernel}; Docker ${labEvidence.environment.docker}; K3s ${labEvidence.environment.kubernetes}.`;

@@ -1,12 +1,12 @@
 # Запуск и проверка Container Security Lab
 
-Container Security Lab — воспроизводимый стенд для сравнения обычных
+Container Security Lab - воспроизводимый стенд для сравнения обычных
 и усиленных конфигураций Docker и Kubernetes. Приложение состоит из шлюза
 и хранилища заметок. Один образ запускается с разными ограничениями;
 результаты функциональных и защитных проверок записываются в `evidence/`.
 
-[Исходники](https://github.com/archeemage-hub/container-security-lab) ·
-[Версия 1.0.1](https://github.com/archeemage-hub/container-security-lab/tree/v1.0.1) ·
+[Исходники](https://github.com/archeemage-hub/container-security-lab) |
+[Версия 1.0.2](https://github.com/archeemage-hub/container-security-lab/tree/v1.0.2) |
 [Браузерная демонстрация](https://archeemage-hub.github.io/container-security-lab/)
 
 ## Требования
@@ -35,7 +35,7 @@ python3 --version
 ## Получение исходников
 
 ```bash
-git clone --branch v1.0.1 https://github.com/archeemage-hub/container-security-lab.git
+git clone --branch v1.0.2 https://github.com/archeemage-hub/container-security-lab.git
 cd container-security-lab
 ```
 
@@ -106,7 +106,7 @@ docker exec csl-k3s /bin/kubectl get pods -n article-secure
 | Усиленный | `http://127.0.0.1:18080/notes` |
 
 GET `/notes` возвращает `notes` и `count`. POST `/notes` принимает
-JSON-объект с полем `text`. Пределы: 1–160 символов, 100 заметок
+JSON-объект с полем `text`. Пределы: 1-160 символов, 100 заметок
 в хранилище и 4096 байт на тело запроса.
 
 ```bash
@@ -231,7 +231,7 @@ GitHub Pages. Она позволяет создавать заметки в loc
 python3 -m http.server 8088 --directory docs --bind 127.0.0.1
 ```
 
-Адрес просмотра — `http://127.0.0.1:8088/`; остановка сервера — Ctrl+C.
+Адрес просмотра - `http://127.0.0.1:8088/`; остановка сервера - Ctrl+C.
 Для страницы не требуется Docker. GitHub Pages публикует статические файлы
 и не выполняет Python-приложение или кластер Kubernetes.
 
@@ -277,7 +277,7 @@ docker compose -p csl-cluster -f compose.cluster.yaml down -v
 | Узел K3s не стал Ready | Свободная память и `docker logs --tail 100 csl-k3s` |
 | Pod не готов, `ImagePullBackOff` | `kubectl describe`; повторный импорт образа через `deploy.py` |
 | HTTP 503 от шлюза | Готовность store, файл токена и журналы приложения |
-| HTTP 400 при создании | JSON и строка `text` длиной 1–160 символов |
+| HTTP 400 при создании | JSON и строка `text` длиной 1-160 символов |
 | HTTP 413 | Тело запроса не более 4096 байт |
 | HTTP 409 | Достигнут предел 100 заметок |
 | FAIL в проверках | Поля `actual` и `expected` в протоколе |
