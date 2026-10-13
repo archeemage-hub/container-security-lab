@@ -1,0 +1,29 @@
+services:
+  server:
+    image: "rancher/k3s:v1.37.1-k3s1@sha256:ca7f37d993d82ef0dcdcfecb2e0e2618ea541dbaffc620c8cedebe01a82acd0d"
+    container_name: csl-k3s
+    hostname: csl-k3s
+    privileged: true
+    mem_limit: "3g"
+    cpus: 2
+    command:
+      - server
+      - "--disable=traefik,servicelb,metrics-server,local-storage"
+      - "--secrets-encryption"
+      - "--write-kubeconfig-mode=600"
+      - "--cluster-cidr=10.73.0.0/16"
+      - "--service-cidr=10.74.0.0/16"
+    tmpfs:
+      - "/run"
+      - "/var/run"
+    volumes:
+      - "cluster-data:/var/lib/rancher/k3s"
+    ports:
+      - "127.0.0.1:16443:6443"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+      nproc: 65535
+volumes:
+  cluster-data: {}

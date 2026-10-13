@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Учебный проект по безопасности Docker и Kubernetes. Сервис заметок и результаты 41 проверки.">
+  <title>Безопасность Docker и Kubernetes</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="site-config.js" defer></script>
+  <script src="model.js" defer></script>
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Безопасность Docker и Kubernetes</h1>
+    <p>Container Security Lab · учебный проект</p>
+    <nav aria-label="Разделы">
+      <a href="#notes">Заметки</a>
+      <a href="#experiments">Ограничения</a>
+      <a href="#evidence">Результаты стенда</a>
+      <a id="guide-link" href="GUIDE.md">Гайд</a>
+      <a id="source-link" hidden>Исходники на GitHub</a>
+    </nav>
+  </header>
+  <main>
+    <p class="scope">Здесь работает демонстрация в браузере: заметки сохраняются локально,
+      а опыты с ограничениями выполняются моделью. Результаты настоящего запуска
+      Docker и Kubernetes приведены в отдельном протоколе ниже.</p>
+    <section aria-labelledby="configuration-title">
+      <h2 id="configuration-title">Конфигурация</h2>
+      <div class="options">
+        <fieldset>
+          <legend>Среда</legend>
+          <label><input type="radio" name="platform" value="docker"> Docker</label>
+          <label><input type="radio" name="platform" value="kubernetes" checked> Kubernetes</label>
+        </fieldset>
+        <fieldset>
+          <legend>Вариант</legend>
+          <label><input type="radio" name="profile" value="baseline"> Обычный</label>
+          <label><input type="radio" name="profile" value="hardened" checked> Усиленный</label>
+        </fieldset>
+      </div>
+      <p id="configuration-description"></p>
+    </section>
+    <section id="notes" aria-labelledby="notes-title">
+      <h2 id="notes-title">Сервис заметок</h2>
+      <p>Клиент обращается к шлюзу, шлюз — к хранилищу. Лимиты приложения:
+        160 символов в заметке и 100 заметок. Каждая конфигурация имеет свой список.</p>
+      <form id="note-form">
+        <label for="note-text">Текст заметки</label>
+        <input id="note-text" name="text" autocomplete="off" aria-describedby="note-counter">
+        <div class="form-actions">
+          <span id="note-counter">0 / 160 символов</span>
+          <button type="submit">Добавить заметку</button>
+          <button id="read-notes" type="button">Прочитать список</button>
+          <button id="clear-notes" type="button">Очистить этот список</button>
+        </div>
+      </form>
+      <p id="note-status" role="status" aria-live="polite">Список готов к чтению.</p>
+      <div class="table-wrap">
+        <table>
+          <caption id="note-caption">Заметки</caption>
+          <thead><tr><th scope="col">№</th><th scope="col">Текст</th></tr></thead>
+          <tbody id="note-list"></tbody>
+        </table>
+      </div>
+      <p id="storage-status" class="muted"></p>
+    </section>
+    <section id="experiments" aria-labelledby="experiments-title">
+      <h2 id="experiments-title">Опыты с ограничениями</h2>
+      <p>Выберите действие, затем сравните обычный и усиленный варианты.
+        Это модель поведения выбранной конфигурации; новые контейнеры здесь не запускаются.</p>
+      <div class="experiment-actions">
+        <button type="button" data-operation="rootfs">Записать файл в /etc</button>
+        <button type="button" data-operation="data">Записать файл в /data</button>
+        <button type="button" data-operation="token">Обратиться к store без токена</button>
+        <button type="button" data-operation="outsider">Соединить outsider и store</button>
+        <button type="button" data-operation="admission">Создать привилегированный Pod</button>
+      </div>
+      <p id="experiment-status" role="status" aria-live="polite">Результат выбранного действия появится здесь.</p>
+      <p class="muted">Сетевой опыт с outsider и контроль запуска Pod относятся к Kubernetes.</p>
+      <h3>Параметры процесса из протокола</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Параметр</th><th scope="col">Значение</th></tr></thead>
+          <tbody id="process-state"></tbody>
+        </table>
+      </div>
+      <details>
+        <summary>Схема усиленной конфигурации Kubernetes</summary>
+        <img src="topology.jpg" alt="Разрешена цепочка reader — gateway — store; прямое соединение outsider с store запрещено" width="900" height="320">
+      </details>
+    </section>
+    <section id="evidence" aria-labelledby="evidence-title">
+      <h2 id="evidence-title">Проверки на настоящем стенде</h2>
+      <p id="evidence-summary"></p>
+      <p id="environment-description" class="muted"></p>
+      <p>Ниже сохранённый протокол запуска. Изменение заметок и конфигурации
+        в этой демонстрации не меняет результаты измерений.</p>
+      <label for="evidence-filter">Показать проверки</label>
+      <select id="evidence-filter">
+        <option value="all">Все среды</option>
+        <option value="Docker baseline">Docker · обычный</option>
+        <option value="Docker hardened">Docker · усиленный</option>
+        <option value="Kubernetes baseline">Kubernetes · обычный</option>
+        <option value="Kubernetes hardened">Kubernetes · усиленный</option>
+        <option value="Image">Образ приложения</option>
+        <option value="Logging">Журналы</option>
+      </select>
+      <p id="evidence-count" class="muted"></p>
+      <div class="table-wrap">
+        <table class="checks-table">
+          <thead><tr><th scope="col">№</th><th scope="col">Среда</th><th scope="col">Проверка</th><th scope="col">Результат</th></tr></thead>
+          <tbody id="check-list"></tbody>
+        </table>
+      </div>
+      <p><a href="evidence.json" download>Скачать протокол и параметры процессов в JSON</a></p>
+    </section>
+    <section aria-labelledby="reproduce-title">
+      <h2 id="reproduce-title">Повторить опыт</h2>
+      <p>Настоящий стенд запускается на Linux с Docker и Python. Порядок подготовки,
+        ручные проверки и остановка описаны в гайде. После подготовки базового образа:</p>
+      <pre><code>python3 scripts/deploy.py
+python3 scripts/verify.py</code></pre>
+      <p>41/41 — число выполненных проверок, а не оценка безопасности в процентах.
+        Эксперимент не включает поиск CVE, атаки на ядро и нагрузочные испытания.</p>
+    </section>
+    <noscript><p>Для работы демонстрации включите JavaScript. Исходники и протокол доступны в репозитории проекта.</p></noscript>
+  </main>
+  <footer><p>Заметки этой страницы хранятся только в вашем браузере. Отправки на сервер нет.</p></footer>
+</body>
+</html>

@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: article-baseline
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: v1.37
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: notes-app
+  namespace: article-baseline
+automountServiceAccountToken: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store
+  namespace: article-baseline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store
+  template:
+    metadata:
+      labels:
+        app: store
+    spec:
+      serviceAccountName: notes-app
+      containers:
+        - name: store
+          image: "container-security-lab:1.0"
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_ROLE
+              value: store
+            - name: TOKEN_FILE
+              value: "/run/application-secrets/backend-token"
+          volumeMounts:
+            - name: backend-token
+              mountPath: "/run/application-secrets"
+              readOnly: true
+            - name: data
+              mountPath: "/data"
+          readinessProbe:
+            httpGet:
+              path: "/ready"
+              port: 8080
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      volumes:
+        - name: backend-token
+          secret:
+            secretName: backend-token
+            defaultMode: 0444
+        - name: data
+          emptyDir:
+            sizeLimit: "16Mi"
+      securityContext:
+        runAsUser: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: store
+  namespace: article-baseline
+spec:
+  type: ClusterIP
+  selector:
+    app: store
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: article-baseline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      serviceAccountName: notes-app
+      containers:
+        - name: gateway
+          image: "container-security-lab:1.0"
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_ROLE
+              value: gateway
+            - name: TOKEN_FILE
+              value: "/run/application-secrets/backend-token"
+            - name: STORE_URL
+              value: "http://store:8080"
+          volumeMounts:
+            - name: backend-token
+              mountPath: "/run/application-secrets"
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: "/ready"
+              port: 8080
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      volumes:
+        - name: backend-token
+          secret:
+            secretName: backend-token
+            defaultMode: 0444
+      securityContext:
+        runAsUser: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: article-baseline
+spec:
+  type: ClusterIP
+  selector:
+    app: gateway
+  ports:
+    - port: 8080
+      targetPort: 8080

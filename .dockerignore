@@ -1,0 +1,13 @@
+.runtime
+evidence
+__pycache__
+*.pyc
+*.tar
+*.zip
+.git
+README.md
+k8s
+scripts
+compose*.yaml
+MANIFEST.sha256
+docs

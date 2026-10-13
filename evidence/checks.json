@@ -1,0 +1,407 @@
+{
+  "passed": 41,
+  "total": 41,
+  "checks": [
+    {
+      "id": 1,
+      "name": "Process identity",
+      "environment": "Docker baseline",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": 2,
+      "name": "Root filesystem write",
+      "environment": "Docker baseline",
+      "passed": true,
+      "actual": {
+        "allowed": true
+      },
+      "expected": "allowed"
+    },
+    {
+      "id": 3,
+      "name": "Application data write",
+      "environment": "Docker baseline",
+      "passed": true,
+      "actual": {
+        "allowed": true
+      },
+      "expected": "allowed"
+    },
+    {
+      "id": 4,
+      "name": "Temporary directory write",
+      "environment": "Docker baseline",
+      "passed": true,
+      "actual": {
+        "allowed": true
+      },
+      "expected": "allowed"
+    },
+    {
+      "id": 5,
+      "name": "Seccomp filtering active",
+      "environment": "Docker baseline",
+      "passed": true,
+      "actual": "2",
+      "expected": "2"
+    },
+    {
+      "id": 6,
+      "name": "No Docker socket in application",
+      "environment": "Docker baseline",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "id": 7,
+      "name": "Create and read a note",
+      "environment": "Docker baseline",
+      "passed": true,
+      "actual": {
+        "get_before": 200,
+        "post": 201,
+        "get_after": 200
+      },
+      "expected": "200/201/200"
+    },
+    {
+      "id": 8,
+      "name": "Backend authentication",
+      "environment": "Docker baseline",
+      "passed": true,
+      "actual": {
+        "reachable": true,
+        "status": 401
+      },
+      "expected": "401 without token"
+    },
+    {
+      "id": 9,
+      "name": "Process identity",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": 10001,
+      "expected": 10001
+    },
+    {
+      "id": 10,
+      "name": "Root filesystem write",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": {
+        "allowed": false,
+        "errno": 30,
+        "error": "Read-only file system"
+      },
+      "expected": "blocked"
+    },
+    {
+      "id": 11,
+      "name": "Application data write",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": {
+        "allowed": true
+      },
+      "expected": "allowed"
+    },
+    {
+      "id": 12,
+      "name": "Temporary directory write",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": {
+        "allowed": true
+      },
+      "expected": "allowed"
+    },
+    {
+      "id": 13,
+      "name": "Capabilities removed",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": "0000000000000000",
+      "expected": "zero"
+    },
+    {
+      "id": 14,
+      "name": "Privilege escalation blocked",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": "1",
+      "expected": "1"
+    },
+    {
+      "id": 15,
+      "name": "Seccomp filtering active",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": "2",
+      "expected": "2"
+    },
+    {
+      "id": 16,
+      "name": "No Docker socket in application",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "id": 17,
+      "name": "Create and read a note",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": {
+        "get_before": 200,
+        "post": 201,
+        "get_after": 200
+      },
+      "expected": "200/201/200"
+    },
+    {
+      "id": 18,
+      "name": "Backend authentication",
+      "environment": "Docker hardened",
+      "passed": true,
+      "actual": {
+        "reachable": true,
+        "status": 401
+      },
+      "expected": "401 without token"
+    },
+    {
+      "id": 19,
+      "name": "Runtime token absent from image filesystem",
+      "environment": "Image",
+      "passed": true,
+      "actual": "rootfs archive scanned",
+      "expected": "absent"
+    },
+    {
+      "id": 20,
+      "name": "Process identity",
+      "environment": "Kubernetes baseline",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": 21,
+      "name": "Root filesystem write",
+      "environment": "Kubernetes baseline",
+      "passed": true,
+      "actual": {
+        "allowed": true
+      },
+      "expected": "allowed"
+    },
+    {
+      "id": 22,
+      "name": "Writable data and temporary volumes",
+      "environment": "Kubernetes baseline",
+      "passed": true,
+      "actual": {
+        "data": {
+          "allowed": true
+        },
+        "tmp": {
+          "allowed": true
+        }
+      },
+      "expected": "both allowed"
+    },
+    {
+      "id": 23,
+      "name": "ServiceAccount token mount",
+      "environment": "Kubernetes baseline",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "id": 24,
+      "name": "Unrelated Pod to backend",
+      "environment": "Kubernetes baseline",
+      "passed": true,
+      "actual": {
+        "reachable": true,
+        "status": 200,
+        "payload": {
+          "status": "ok",
+          "role": "store"
+        }
+      },
+      "expected": "reachable"
+    },
+    {
+      "id": 25,
+      "name": "Allowed reader to gateway to backend",
+      "environment": "Kubernetes baseline",
+      "passed": true,
+      "actual": {
+        "get_before": 200,
+        "post": 201,
+        "get_after": 200
+      },
+      "expected": "200/201/200"
+    },
+    {
+      "id": 26,
+      "name": "Process identity",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": 10001,
+      "expected": 10001
+    },
+    {
+      "id": 27,
+      "name": "Root filesystem write",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": {
+        "allowed": false,
+        "errno": 30,
+        "error": "Read-only file system"
+      },
+      "expected": "blocked"
+    },
+    {
+      "id": 28,
+      "name": "Writable data and temporary volumes",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": {
+        "data": {
+          "allowed": true
+        },
+        "tmp": {
+          "allowed": true
+        }
+      },
+      "expected": "both allowed"
+    },
+    {
+      "id": 29,
+      "name": "ServiceAccount token mount",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "id": 30,
+      "name": "Capabilities removed",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": "0000000000000000",
+      "expected": "zero"
+    },
+    {
+      "id": 31,
+      "name": "Privilege escalation blocked",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": "1",
+      "expected": "1"
+    },
+    {
+      "id": 32,
+      "name": "Seccomp filtering active",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": "2",
+      "expected": "2"
+    },
+    {
+      "id": 33,
+      "name": "Unrelated Pod to backend",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": {
+        "reachable": false,
+        "error_type": "URLError",
+        "error": "<urlopen error [Errno 111] Connection refused>"
+      },
+      "expected": "blocked"
+    },
+    {
+      "id": 34,
+      "name": "Allowed reader to gateway to backend",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": {
+        "get_before": 200,
+        "post": 201,
+        "get_after": 200
+      },
+      "expected": "200/201/200"
+    },
+    {
+      "id": 35,
+      "name": "RBAC notes-app lists secrets",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": "no",
+      "expected": "no"
+    },
+    {
+      "id": 36,
+      "name": "RBAC notes-app lists pods",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": "no",
+      "expected": "no"
+    },
+    {
+      "id": 37,
+      "name": "RBAC notes-observer lists secrets",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": "no",
+      "expected": "no"
+    },
+    {
+      "id": 38,
+      "name": "RBAC notes-observer lists pods",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": "yes",
+      "expected": "yes"
+    },
+    {
+      "id": 39,
+      "name": "Privileged root Pod rejected before launch",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": "Error from server (Forbidden): error when creating \"STDIN\": pods \"rejected-privileged\" is forbidden: violates PodSecurity \"restricted:v1.37\": privileged (container \"test\" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container \"test\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"test\" must set securityContext.capabilities.drop=[\"ALL\"]), runAsNonRoot != true (pod or container \"test\" must set securityContext.runAsNonRoot=true), runAsUser=0 (container \"test\" must not set runAsUser=0), seccompProfile (pod or container \"test\" must set securityContext.seccompProfile.type to \"RuntimeDefault\" or \"Localhost\")",
+      "expected": "Forbidden by restricted policy"
+    },
+    {
+      "id": 40,
+      "name": "Secret encrypted in cluster datastore",
+      "environment": "Kubernetes hardened",
+      "passed": true,
+      "actual": {
+        "record_found": true,
+        "encrypted_prefix": true,
+        "token_in_stored_value": false,
+        "storage": "SQLite/Kine",
+        "provider": "AES-CBC"
+      },
+      "expected": "AES-CBC prefix, no plaintext token"
+    },
+    {
+      "id": 41,
+      "name": "Structured logs contain no runtime token",
+      "environment": "Logging",
+      "passed": true,
+      "actual": "logs scanned",
+      "expected": "token absent and POST recorded"
+    }
+  ]
+}

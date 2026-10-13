@@ -1,0 +1,58 @@
+services:
+  store:
+    image: "container-security-lab:1.0"
+    pull_policy: never
+    environment:
+      APP_ROLE: store
+    secrets:
+      - source: backend-token
+        target: backend-token
+    networks:
+      - backend
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - "-c"
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=2)"
+      interval: "3s"
+      timeout: "3s"
+      retries: 15
+    volumes:
+      - "notes:/data"
+    user: "0:0"
+  gateway:
+    image: "container-security-lab:1.0"
+    pull_policy: never
+    environment:
+      APP_ROLE: gateway
+    secrets:
+      - source: backend-token
+        target: backend-token
+    networks:
+      - backend
+      - edge
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - "-c"
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=2)"
+      interval: "3s"
+      timeout: "3s"
+      retries: 15
+    ports:
+      - "127.0.0.1:18081:8080"
+    depends_on:
+      store:
+        condition: service_healthy
+    user: "0:0"
+secrets:
+  backend-token:
+    file: ".runtime/backend-token"
+networks:
+  edge: {}
+  backend:
+    internal: false
+volumes:
+  notes: {}

@@ -1,0 +1,346 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: article-secure
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: v1.37
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: notes-app
+  namespace: article-secure
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store
+  namespace: article-secure
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: store
+  template:
+    metadata:
+      labels:
+        app: store
+    spec:
+      serviceAccountName: notes-app
+      containers:
+        - name: store
+          image: "container-security-lab:1.0"
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_ROLE
+              value: store
+            - name: TOKEN_FILE
+              value: "/run/application-secrets/backend-token"
+          volumeMounts:
+            - name: backend-token
+              mountPath: "/run/application-secrets"
+              readOnly: true
+            - name: data
+              mountPath: "/data"
+            - name: tmp
+              mountPath: "/tmp"
+          readinessProbe:
+            httpGet:
+              path: "/ready"
+              port: 8080
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+      volumes:
+        - name: backend-token
+          secret:
+            secretName: backend-token
+            defaultMode: 0444
+        - name: data
+          emptyDir:
+            sizeLimit: "16Mi"
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: "16Mi"
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: store
+  namespace: article-secure
+spec:
+  type: ClusterIP
+  selector:
+    app: store
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: article-secure
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      serviceAccountName: notes-app
+      containers:
+        - name: gateway
+          image: "container-security-lab:1.0"
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_ROLE
+              value: gateway
+            - name: TOKEN_FILE
+              value: "/run/application-secrets/backend-token"
+            - name: STORE_URL
+              value: "http://store:8080"
+          volumeMounts:
+            - name: backend-token
+              mountPath: "/run/application-secrets"
+              readOnly: true
+            - name: tmp
+              mountPath: "/tmp"
+          readinessProbe:
+            httpGet:
+              path: "/ready"
+              port: 8080
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+      volumes:
+        - name: backend-token
+          secret:
+            secretName: backend-token
+            defaultMode: 0444
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: "16Mi"
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: article-secure
+spec:
+  type: ClusterIP
+  selector:
+    app: gateway
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: article-secure
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: article-secure
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gateway-to-store
+  namespace: article-secure
+spec:
+  podSelector:
+    matchLabels:
+      app: gateway
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: store
+      ports:
+        - port: 8080
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: store-from-gateway
+  namespace: article-secure
+spec:
+  podSelector:
+    matchLabels:
+      app: store
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: gateway
+      ports:
+        - port: 8080
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gateway-from-reader
+  namespace: article-secure
+spec:
+  podSelector:
+    matchLabels:
+      app: gateway
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: reader
+      ports:
+        - port: 8080
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: reader-to-gateway
+  namespace: article-secure
+spec:
+  podSelector:
+    matchLabels:
+      app: reader
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: gateway
+      ports:
+        - port: 8080
+          protocol: TCP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: notes-observer
+  namespace: article-secure
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: observe-pods
+  namespace: article-secure
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: observer
+  namespace: article-secure
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: observe-pods
+subjects:
+  - kind: ServiceAccount
+    name: notes-observer
+    namespace: article-secure

@@ -1,0 +1,86 @@
+{
+  "docker": {
+    "baseline": {
+      "uid": 0,
+      "gid": 0,
+      "cap_eff": "00000000a80425fb",
+      "no_new_privs": "0",
+      "seccomp": "2",
+      "rootfs_write": {
+        "allowed": true
+      },
+      "temporary_write": {
+        "allowed": true
+      },
+      "data_write": {
+        "allowed": true
+      },
+      "service_account_token": false,
+      "docker_socket": false,
+      "secret_mount": true
+    },
+    "hardened": {
+      "uid": 10001,
+      "gid": 10001,
+      "cap_eff": "0000000000000000",
+      "no_new_privs": "1",
+      "seccomp": "2",
+      "rootfs_write": {
+        "allowed": false,
+        "errno": 30,
+        "error": "Read-only file system"
+      },
+      "temporary_write": {
+        "allowed": true
+      },
+      "data_write": {
+        "allowed": true
+      },
+      "service_account_token": false,
+      "docker_socket": false,
+      "secret_mount": true
+    }
+  },
+  "kubernetes": {
+    "baseline": {
+      "uid": 0,
+      "gid": 0,
+      "cap_eff": "00000000a80425fb",
+      "no_new_privs": "0",
+      "seccomp": "0",
+      "rootfs_write": {
+        "allowed": true
+      },
+      "temporary_write": {
+        "allowed": true
+      },
+      "data_write": {
+        "allowed": true
+      },
+      "service_account_token": true,
+      "docker_socket": false,
+      "secret_mount": true
+    },
+    "hardened": {
+      "uid": 10001,
+      "gid": 10001,
+      "cap_eff": "0000000000000000",
+      "no_new_privs": "1",
+      "seccomp": "2",
+      "rootfs_write": {
+        "allowed": false,
+        "errno": 30,
+        "error": "Read-only file system"
+      },
+      "temporary_write": {
+        "allowed": true
+      },
+      "data_write": {
+        "allowed": true
+      },
+      "service_account_token": false,
+      "docker_socket": false,
+      "secret_mount": true
+    }
+  }
+}

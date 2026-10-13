@@ -1,0 +1,11 @@
+.runtime/
+__pycache__/
+*.pyc
+*.tar
+*.zip
+.venv/
+.env
+.env.*
+*.db
+*.db-wal
+*.db-shm
